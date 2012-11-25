@@ -74,7 +74,7 @@ public class FaceFinder {
     
     private Bitmap cropToFace(Bitmap bitmap, Face face){
         
-        do stuff here !!!
+        //do stuff here !!!
         
         Bitmap resBitmap = bitmap; 
         
