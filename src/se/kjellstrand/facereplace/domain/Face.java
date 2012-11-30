@@ -1,18 +1,20 @@
 package se.kjellstrand.facereplace.domain;
 
-import android.graphics.Point;
-
+/** Holds the results from a face detection
+ * 
+ * face.confidence()
+ * face.eyesDistance()
+ * face.pose(FaceDetector.Face.EULER_X)
+ * face.pose(FaceDetector.Face.EULER_Y)
+ * face.pose(FaceDetector.Face.EULER_Z)
+ * eyesMidPts[i].x
+ * eyesMidPts[i].y
+ * 
+ * @author erbsman
+ *
+ */
 public class Face {
 
-    /*
-        face.confidence()
-        face.eyesDistance()
-        face.pose(FaceDetector.Face.EULER_X)
-        face.pose(FaceDetector.Face.EULER_Y)
-        face.pose(FaceDetector.Face.EULER_Z)
-        eyesMidPts[i].x
-        eyesMidPts[i].y
-     */
     private byte[] image;
     private String tag;
     private float confidence;

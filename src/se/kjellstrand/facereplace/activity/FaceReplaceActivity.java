@@ -17,6 +17,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.Trace;
@@ -29,7 +30,7 @@ import se.kjellstrand.facereplace.view.FaceView;
 public class FaceReplaceActivity extends Activity {
     private static final int CAPTURE_PIC = 111101010;
 
-    private Bitmap bitmap;
+    private static final String FILE_URI_KEY = "FILE_URI_KEY";
 
     private Uri mFileUri = null;
 
@@ -40,18 +41,33 @@ public class FaceReplaceActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        pickImage();
-
-        if (bitmap != null) {
-            faceView.setBitmap(bitmap);
-            faceView.findFaces();
+        if (savedInstanceState != null && savedInstanceState.containsKey(FILE_URI_KEY)) {
+            mFileUri = Uri.parse(savedInstanceState.getString(FILE_URI_KEY));
         }
+    }
+    
+    @AfterViews
+    void init(){
+        mFileUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(),
+                "/download/img.jpg"));
+        Log.d("TAG", "PATH: "+mFileUri.getPath());
+        if (mFileUri == null) {
+            pickImage();
+        } else {
+            loadImageAndFindFaces(mFileUri);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(FILE_URI_KEY, mFileUri.getPath());
     }
 
     public void pickImage() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        mFileUri = getTempFileName();
+        if (mFileUri == null) {
+            mFileUri = getTempFileUri();
+        }
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mFileUri);
         startActivityForResult(takePictureIntent, CAPTURE_PIC);
     }
@@ -69,32 +85,35 @@ public class FaceReplaceActivity extends Activity {
                 imageUri = mFileUri;
             }
 
-            //bitmap = BitmapFactory.decodeFile(imageUri.getPath());
-
-            bitmap = getImageFromSDCard(imageUri.getPath());
-            
-            Log.d("", "bitmap: " + bitmap);
-
-            faceView.setBitmap(bitmap);
-
-            faceView.findFaces();
+            loadImageAndFindFaces(imageUri);
         }
     }
-    
-    private Bitmap getImageFromSDCard(String path){
+
+    private void loadImageAndFindFaces(Uri imageUri) {
+        Bitmap bitmap = getImageFromSDCard(imageUri.getPath());
+
+        faceView.setBitmap(bitmap);
+
+        faceView.findFaces();
+
+        faceView.invalidate();
+    }
+
+    private Bitmap getImageFromSDCard(String path) {
         try {
             File f = new File(path);
             ExifInterface exif = new ExifInterface(f.getPath());
-            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
 
             int angle = 0;
 
             if (orientation == ExifInterface.ORIENTATION_ROTATE_90) {
                 angle = 90;
-            } 
+            }
             else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) {
                 angle = 180;
-            } 
+            }
             else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) {
                 angle = 270;
             }
@@ -102,24 +121,28 @@ public class FaceReplaceActivity extends Activity {
             Matrix mat = new Matrix();
             mat.postRotate(angle);
 
-            Bitmap bmp = BitmapFactory.decodeStream(new FileInputStream(f), null, null);
-            Bitmap correctBmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mat, true);
-            
-            return correctBmp;
-        }
-        catch (IOException e) {
-            Log.w("TAG", "-- Error in setting image");
-        }   
-        catch(OutOfMemoryError oom) {
-            Log.w("TAG", "-- OOM Error in setting image");
+            BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
+            bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+            //bitmapFatoryOptions.inJustDecodeBounds = true;
+            Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(f), null,
+                    bitmapFatoryOptions);
+//            bitmapFatoryOptions = new BitmapFactory.Options();
+//            Bitmap correctBmp = Bitmap.createBitmap(bmp, 0, 0, bitmapFatoryOptions.outWidth, bitmapFatoryOptions.outHeight,
+//                    mat, true);
+
+            return bitmap;
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } catch (OutOfMemoryError oom) {
+            oom.printStackTrace();
         }
         return null;
     }
 
-    private Uri getTempFileName()
+    private Uri getTempFileUri()
     {
         return Uri.fromFile(new File(Environment.getExternalStorageDirectory(),
-                "tmp_avatar_" + String.valueOf(System.currentTimeMillis()) + ".jpg"));
+                "FaceReplace" + String.valueOf(System.currentTimeMillis()) + ".jpg"));
     }
 
 }

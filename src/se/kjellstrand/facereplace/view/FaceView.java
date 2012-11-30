@@ -40,6 +40,7 @@ public class FaceView extends View {
         super.onDraw(canvas);
 
         if (bitmap != null) {
+            
             float xRatio = ((float) getWidth()) / bitmap.getWidth();
             float yRatio = ((float) getHeight()) / bitmap.getHeight();
             Log.d(TAG, "bm w and h: " + bitmap.getWidth() + "  " + bitmap.getHeight());
@@ -54,8 +55,8 @@ public class FaceView extends View {
                     // canvas.drawCircle(eyesMidPts[i].x * xRatio,
                     // eyesMidPts[i].y * yRatio, eyesDistance[i] / 6, tmpPaint);
                     Log.d(TAG, "draw circle");
-                    canvas.drawCircle(eyesMidPts[i].x * xRatio, eyesMidPts[i].y * yRatio,
-                            eyesDistance[i] / 2, tmpPaint);
+//                    canvas.drawCircle(eyesMidPts[i].x * xRatio, eyesMidPts[i].y * yRatio,
+//                            eyesDistance[i] / 2, tmpPaint);
                     RectF oval = new RectF();
                     float left = eyesMidPts[i].x * xRatio - eyesDistance[i] * xRatio;
                     float right = eyesMidPts[i].x * xRatio + eyesDistance[i] * xRatio;
@@ -65,7 +66,7 @@ public class FaceView extends View {
 
                     Log.d(TAG, "(eyesDistance[i] / 2) * xRatio: " + (eyesDistance[i] / 2) * xRatio);
 
-                    oval.set(left, top, right, bottom);
+                    oval.set(eyesMidPts[i].x-20, eyesMidPts[i].y-20, eyesMidPts[i].x+20, eyesMidPts[i].y-20);
                     canvas.drawOval(oval, tmpPaint);
                     Log.d(TAG, "oval: " + oval);
 
@@ -76,10 +77,10 @@ public class FaceView extends View {
 
     public void findFaces() {
         long startTime = System.currentTimeMillis();
-        int picWidth = bitmap.getWidth();
-        int picHeight = bitmap.getHeight();
 
         if (bitmap != null) {
+            int picWidth = bitmap.getWidth();
+            int picHeight = bitmap.getHeight();
 
             facesDetector = new FaceDetector(picWidth, picHeight, NUM_FACES);
             facesDetector.findFaces(bitmap, faces);
@@ -87,6 +88,7 @@ public class FaceView extends View {
             for (int i = 0; i < faces.length; i++) {
                 face = faces[i];
                 if (face != null) {
+                    Log.d(TAG, "Found " + i + " faces.");
                     PointF eyesMP = new PointF();
                     face.getMidPoint(eyesMP);
                     eyesDistance[i] = face.eyesDistance();
@@ -105,6 +107,5 @@ public class FaceView extends View {
             }
         }
         Log.d(TAG, "Finding faces took " + (System.currentTimeMillis() - startTime) + " ms.");
-
     }
 }
