@@ -8,6 +8,7 @@ import java.io.IOException;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
@@ -17,16 +18,9 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.Click;
-import com.googlecode.androidannotations.annotations.EActivity;
-import com.googlecode.androidannotations.annotations.Trace;
-import com.googlecode.androidannotations.annotations.ViewById;
-
 import se.kjellstrand.facereplace.R;
 import se.kjellstrand.facereplace.view.FaceView;
 
-@EActivity(R.layout.main)
 public class FaceReplaceActivity extends Activity {
     private static final int CAPTURE_PIC = 111101010;
 
@@ -34,20 +28,21 @@ public class FaceReplaceActivity extends Activity {
 
     private Uri mFileUri = null;
 
-    @ViewById(R.id.resultImageView)
-    FaceView faceView;
+    private FaceView faceView;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        setContentView(R.layout.main);
+        
         if (savedInstanceState != null && savedInstanceState.containsKey(FILE_URI_KEY)) {
             mFileUri = Uri.parse(savedInstanceState.getString(FILE_URI_KEY));
         }
-    }
     
-    @AfterViews
-    void init(){
+        faceView = (FaceView) findViewById(R.id.resultImageView);
+        
         mFileUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(),
                 "/download/img.jpg"));
         Log.d("TAG", "PATH: "+mFileUri.getPath());
@@ -123,12 +118,16 @@ public class FaceReplaceActivity extends Activity {
 
             BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
             bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+            bitmapFatoryOptions.inSampleSize = 3;
+            bitmapFatoryOptions.inMutable = true;
             //bitmapFatoryOptions.inJustDecodeBounds = true;
             Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(f), null,
                     bitmapFatoryOptions);
 //            bitmapFatoryOptions = new BitmapFactory.Options();
 //            Bitmap correctBmp = Bitmap.createBitmap(bmp, 0, 0, bitmapFatoryOptions.outWidth, bitmapFatoryOptions.outHeight,
 //                    mat, true);
+
+            
 
             return bitmap;
         } catch (IOException ioe) {
