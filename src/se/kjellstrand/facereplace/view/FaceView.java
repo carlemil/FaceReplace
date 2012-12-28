@@ -50,7 +50,7 @@ public class FaceView extends View {
                     mBitmap.getWidth(), mBitmap.getHeight()), mPaint);
             for (Face face : mFaces) {
                 if (face != null) {
-                    Rect src = getFaceRect(mFaces[0]);
+                    Rect src = getFaceRect(mFaces[1]);
                     Rect dst = getFaceRect(face);
                     
                     Log.d(TAG, "src rect: " + src);
