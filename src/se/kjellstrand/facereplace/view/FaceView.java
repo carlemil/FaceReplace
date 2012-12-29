@@ -3,11 +3,17 @@ package se.kjellstrand.facereplace.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.media.FaceDetector;
 import android.media.FaceDetector.Face;
 import android.util.AttributeSet;
@@ -23,13 +29,18 @@ public class FaceView extends View {
     private final FaceDetector.Face mFaces[] = new FaceDetector.Face[NUM_FACES];
 
     private Bitmap mBitmap;
+    private Bitmap mOneFaceBitmap;    
+    private Bitmap mOvalBitmap;
 
     private FaceDetector mFacesDetector;
 
     private PointF mMidPoint = new PointF();
-    private Paint mPaint = new Paint(); // Paint.ANTI_ALIAS_FLAG
+    private Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
 
-    private int[] mFacesIndex = new int[NUM_FACES];;
+    private int[] mFacesIndex = new int[NUM_FACES];
+    
+    private BlurMaskFilter mMediumOuterBlurMaskFilter;
+
 
     public FaceView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
@@ -43,10 +54,10 @@ public class FaceView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        mFacesIndex[0]=1;
-        mFacesIndex[1]=2;
-        mFacesIndex[2]=3;
-        mFacesIndex[3]=0;
+        mFacesIndex[0] = 1;
+        mFacesIndex[1] = 2;
+        mFacesIndex[2] = 3;
+        mFacesIndex[3] = 0;
         drawFacesOnCanvas(canvas);
     }
 
@@ -54,17 +65,47 @@ public class FaceView extends View {
         if (mBitmap != null) {
             canvas.drawBitmap(mBitmap, null, new Rect(0, 0,
                     mBitmap.getWidth(), mBitmap.getHeight()), mPaint);
-            int i=0;
+            int sc = canvas.saveLayer(null, mPaint, Canvas.MATRIX_SAVE_FLAG |
+                    Canvas.CLIP_SAVE_FLAG |
+                    Canvas.HAS_ALPHA_LAYER_SAVE_FLAG |
+                    Canvas.FULL_COLOR_LAYER_SAVE_FLAG |
+                    Canvas.CLIP_TO_LAYER_SAVE_FLAG);
+            int i = 0;
             for (Face face : mFaces) {
                 if (face != null) {
-                    Rect src = getFaceRect(mFaces[mFacesIndex [i++]]);
+                    Rect src = getFaceRect(mFaces[mFacesIndex[i++]]);
                     Rect dst = getFaceRect(face);
+
+                    boolean filter = true;
+                    Matrix m = new Matrix();
+
+                    m.setScale(2f, 2f);
+                    
+                    mMediumOuterBlurMaskFilter = 
+                            new BlurMaskFilter(6.0f, BlurMaskFilter.Blur.NORMAL);
+
+                    mPaint.setMaskFilter(mMediumOuterBlurMaskFilter);
+                    
+                    mOneFaceBitmap = Bitmap.createBitmap(mBitmap, src.left, src.top,
+                            src.right - src.left, src.bottom - src.top, m, filter);
+
+                    mOvalBitmap = Bitmap.createBitmap(src.right - src.left, src.bottom - src.top,
+                            Bitmap.Config.ARGB_8888);
+                    
+                    mPaint.setXfermode(null);
+                    canvas.drawOval(new RectF(dst), mPaint);
+                    
+                    mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
                     
                     Log.d(TAG, "src rect: " + src);
                     Log.d(TAG, "dst rect: " + dst);
-                    canvas.drawBitmap(mBitmap, src, dst, mPaint);
+                    canvas.drawBitmap(mOneFaceBitmap, null, dst, mPaint);
+                    //
+                    // canvas.drawBitmap(mBitmap, src, dst, mPaint);
+
                 }
             }
+            canvas.restoreToCount(sc);
         }
     }
 
@@ -75,8 +116,8 @@ public class FaceView extends View {
         face.getMidPoint(mMidPoint);
         int x = (int) (mMidPoint.x - (face.eyesDistance()));
         int y = (int) (mMidPoint.y - (face.eyesDistance()));
-        int width = x + Math.abs((int) (face.eyesDistance() * 2));
-        int height = y + Math.abs((int) (face.eyesDistance() * 2 * GOLDEN_RATIO));
+        int width = x + (int) (face.eyesDistance() * 2);
+        int height = y + (int) (face.eyesDistance() * 2 * GOLDEN_RATIO);
         return new Rect(x, y, width, height);
     }
 
@@ -86,7 +127,15 @@ public class FaceView extends View {
             mFacesDetector = new FaceDetector(mBitmap.getWidth(),
                     mBitmap.getHeight(), NUM_FACES);
             mFacesDetector.findFaces(mBitmap, mFaces);
+            Log.d(TAG, "Finding faces took " + (System.currentTimeMillis() - startTime) + " ms.");
+
+            startTime = System.currentTimeMillis();
+            boolean isMutable = true;
+            mBitmap = mBitmap.copy(Bitmap.Config.ARGB_8888, isMutable);
+            Log.d(TAG, "Converting bitmap to 8888 format took: "
+                    + (System.currentTimeMillis() - startTime) + " ms.");
+        } else {
+
         }
-        Log.d(TAG, "Finding faces took " + (System.currentTimeMillis() - startTime) + " ms.");
     }
 }
