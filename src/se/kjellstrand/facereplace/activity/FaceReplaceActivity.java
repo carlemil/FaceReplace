@@ -117,19 +117,16 @@ public class FaceReplaceActivity extends Activity {
             mat.postRotate(angle);
 
             BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
+
             bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
             bitmapFatoryOptions.inSampleSize = 3;
             bitmapFatoryOptions.inMutable = true;
-            //bitmapFatoryOptions.inJustDecodeBounds = true;
+
             Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(f), null,
                     bitmapFatoryOptions);
-//            bitmapFatoryOptions = new BitmapFactory.Options();
-//            Bitmap correctBmp = Bitmap.createBitmap(bmp, 0, 0, bitmapFatoryOptions.outWidth, bitmapFatoryOptions.outHeight,
-//                    mat, true);
-
             
-
             return bitmap;
+            
         } catch (IOException ioe) {
             ioe.printStackTrace();
         } catch (OutOfMemoryError oom) {

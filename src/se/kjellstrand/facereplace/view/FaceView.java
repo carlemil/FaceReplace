@@ -22,15 +22,14 @@ public class FaceView extends View {
 
     private final FaceDetector.Face mFaces[] = new FaceDetector.Face[NUM_FACES];
 
-    // private ArrayList<Bitmap> mFaceBitmaps;
-
-    private Bitmap mOriginalBitmap;
     private Bitmap mBitmap;
 
     private FaceDetector mFacesDetector;
 
     private PointF mMidPoint = new PointF();
     private Paint mPaint = new Paint(); // Paint.ANTI_ALIAS_FLAG
+
+    private int[] mFacesIndex = new int[NUM_FACES];;
 
     public FaceView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
@@ -44,13 +43,21 @@ public class FaceView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        mFacesIndex[0]=1;
+        mFacesIndex[1]=2;
+        mFacesIndex[2]=3;
+        mFacesIndex[3]=0;
+        drawFacesOnCanvas(canvas);
+    }
 
+    private void drawFacesOnCanvas(Canvas canvas) {
         if (mBitmap != null) {
             canvas.drawBitmap(mBitmap, null, new Rect(0, 0,
                     mBitmap.getWidth(), mBitmap.getHeight()), mPaint);
+            int i=0;
             for (Face face : mFaces) {
                 if (face != null) {
-                    Rect src = getFaceRect(mFaces[1]);
+                    Rect src = getFaceRect(mFaces[mFacesIndex [i++]]);
                     Rect dst = getFaceRect(face);
                     
                     Log.d(TAG, "src rect: " + src);
@@ -76,47 +83,9 @@ public class FaceView extends View {
     public void findFaces() {
         long startTime = System.currentTimeMillis();
         if (mBitmap != null) {
-            mFacesDetector = new FaceDetector(
-                    mBitmap.getWidth(), mBitmap.getHeight(),
-                    NUM_FACES);
+            mFacesDetector = new FaceDetector(mBitmap.getWidth(),
+                    mBitmap.getHeight(), NUM_FACES);
             mFacesDetector.findFaces(mBitmap, mFaces);
-
-            // mFaceBitmaps = new ArrayList<Bitmap>();
-            //
-            // for (Face face : mFaces) {
-            // if (face != null) {
-            //
-            // Log.d(TAG, "draw circle");
-            //
-            // try {
-            //
-            // Rect faceRect = getFaceRect(face);
-            // int x = faceRect.left;
-            // int y = faceRect.top;
-            // int width = faceRect.width();
-            // int height = faceRect.height();
-            //
-            // int[] pixels = new int[mBitmap.getWidth() * mBitmap.getHeight()];
-            //
-            // Log.d(TAG, mBitmap.getWidth() + "  " +
-            // x + "  " + y + "  " +
-            // width + "  " +
-            // height);
-            //
-            // mBitmap.getPixels(pixels, 0, mBitmap.getWidth(),
-            // x, y, width, height);
-            //
-            // Bitmap bitmap = Bitmap.createBitmap(pixels,
-            // width, height, Bitmap.Config.ARGB_8888);
-            //
-            // mFaceBitmaps.add(bitmap);
-            //
-            // } catch (Exception e) {
-            // e.printStackTrace();
-            // }
-            //
-            // }
-            // }
         }
         Log.d(TAG, "Finding faces took " + (System.currentTimeMillis() - startTime) + " ms.");
     }
