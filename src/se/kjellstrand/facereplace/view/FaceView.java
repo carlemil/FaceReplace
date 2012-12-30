@@ -82,19 +82,10 @@ public class FaceView extends View {
             int i = 0;
             for (Face face : mFaces) {
                 if (face != null) {
-                    Rect src = getFaceRect(mFaces.get(mFacesIndex[i++]));
+                    Rect src = getFaceRect(mFaces.get(mFacesIndex[i]));
                     Rect dst = getFaceRect(face);
 
-                    // boolean filter = true;
-                    // Matrix m = new Matrix();
-                    // m.setScale(2f, 2f);
-                    //
-                    // mOneFaceBitmap = Bitmap.createBitmap(mBitmap, src.left,
-                    // src.top,
-                    // src.right - src.left, src.bottom - src.top, m, filter);
-                    //
-                    
-                    mOneFaceBitmap = mSrcFaceBitmaps.get(1);
+                    mOneFaceBitmap = mSrcFaceBitmaps.get(mFacesIndex[i++]);
                     
                     Bitmap ovalBitmap = Bitmap.createBitmap(src.right - src.left, src.bottom - src.top,
                             Bitmap.Config.ARGB_8888);
@@ -122,13 +113,18 @@ public class FaceView extends View {
         }
     }
 
+    @SuppressWarnings("static-access")
     public void addFacesToSrcFaceBitmapsList(ArrayList<Face> faces, Bitmap bitmap) {
         for (Face face : faces) {
             if (face != null) {
                 Rect src = getFaceRect(face);
 
+                // Experiment with false and see if it looks better
                 boolean filter = true;
                 Matrix m = new Matrix();
+                
+                // calcualte the real scale, or should we do nothing since 
+                // we anyway dont know the fial size ? better send null as matrix ?
                 m.setScale(2f, 2f);
 
                 mSrcFaceBitmaps.add(bitmap.createBitmap(bitmap, src.left, src.top,
