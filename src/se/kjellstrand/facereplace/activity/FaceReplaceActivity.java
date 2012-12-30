@@ -4,6 +4,7 @@ package se.kjellstrand.facereplace.activity;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.media.FaceDetector.Face;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -89,8 +91,10 @@ public class FaceReplaceActivity extends Activity {
 
         faceView.setBitmap(bitmap);
 
-        faceView.findFaces();
+        ArrayList<Face> faces = faceView.findFaces(bitmap);
 
+        faceView.addFacesToSrcFaceBitmapsList(faces, bitmap);
+        
         faceView.invalidate();
     }
 

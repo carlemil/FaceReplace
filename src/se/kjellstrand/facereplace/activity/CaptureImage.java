@@ -29,7 +29,7 @@ public class CaptureImage extends Activity {
 
         if (bitmap != null) {
             faceView.setBitmap(bitmap);
-            faceView.findFaces();
+            faceView.findFaces(bitmap);
         }
     }
 
@@ -44,7 +44,7 @@ public class CaptureImage extends Activity {
             Bundle extras = data.getExtras();
             bitmap = (Bitmap) extras.get("data");
             faceView.setBitmap(bitmap);
-            faceView.findFaces();
+            faceView.findFaces(bitmap);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
