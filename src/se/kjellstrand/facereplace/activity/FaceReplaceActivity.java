@@ -22,6 +22,7 @@ import android.util.Log;
 
 import se.kjellstrand.facereplace.R;
 import se.kjellstrand.facereplace.view.FaceView;
+import se.kjellstrand.facereplace.util.FaceHelper;
 import se.kjellstrand.facereplace.util.FileHandler;
 
 public class FaceReplaceActivity extends Activity {
@@ -29,6 +30,8 @@ public class FaceReplaceActivity extends Activity {
 
     private static final String FILE_URI_KEY = "FILE_URI_KEY";
 
+
+    
     private Uri mFileUri = null;
 
     private FaceView faceView;
@@ -88,14 +91,27 @@ public class FaceReplaceActivity extends Activity {
     }
 
     private void loadImageAndFindFaces(Uri imageUri) {
-        Bitmap bitmap = FileHandler.getImageFromSDCard(imageUri.getPath());
+        Bitmap dstBitmap = FileHandler.getImageFromSDCard(imageUri.getPath());
 
-        faceView.setBitmap(bitmap);
+        faceView.setBitmap(dstBitmap);
 
-        ArrayList<Face> faces = faceView.findFaces(bitmap);
+        ArrayList<Face> dstFaces = FaceHelper.findFaces(dstBitmap);
 
-        faceView.addFacesToSrcFaceBitmapsList(faces, bitmap);
+// skapa src bitmaps och sätt dom istället för dst nedan
         
+        ArrayList<Bitmap> srcBitmaps = new ArrayList<Bitmap>();
+
+        FaceHelper.addFacesToSrcFaceBitmapsList(dstFaces, dstBitmap, srcBitmaps);
+        
+        faceView.setSrcBitmaps(srcBitmaps);
+        
+        int[] array = new int[4];
+        array[0] = 1;
+        array[1] = 2;
+        array[2] = 3;
+        array[3] = 0;
+
+        faceView.setSrcToDstFaceIndexArray(array );
         faceView.invalidate();
     }
 

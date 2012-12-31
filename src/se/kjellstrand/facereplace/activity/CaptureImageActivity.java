@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import se.kjellstrand.facereplace.R;
+import se.kjellstrand.facereplace.util.FaceHelper;
 import se.kjellstrand.facereplace.view.FaceView;
 
 public class CaptureImageActivity extends Activity {
@@ -35,7 +36,6 @@ public class CaptureImageActivity extends Activity {
             Bitmap bitmap = (Bitmap) extras.get(RESPONSE_DATA);
             FaceView faceView = (FaceView) findViewById(R.id.resultImageView);
             faceView.setBitmap(bitmap);
-            faceView.findFaces(bitmap);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
