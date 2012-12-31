@@ -1,3 +1,4 @@
+
 package se.kjellstrand.facereplace.activity;
 
 import android.app.Activity;
@@ -8,32 +9,21 @@ import android.provider.MediaStore;
 import se.kjellstrand.facereplace.R;
 import se.kjellstrand.facereplace.view.FaceView;
 
-public class CaptureImage extends Activity {
+public class CaptureImageActivity extends Activity {
+    
+    private static final String RESPONSE_DATA = "data";
     private static final int REQUEST_CODE = 1;
 
-    private final String     TAG          = CaptureImage.class.getSimpleName();
-    
-    private Bitmap           bitmap;
+    private final String TAG = CaptureImageActivity.class.getSimpleName();
 
-    private FaceView         faceView;
-    
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         setContentView(R.layout.capture);
-        
-        faceView = (FaceView) findViewById(R.id.resultImageView);
-        pickImage();
 
-        if (bitmap != null) {
-            faceView.setBitmap(bitmap);
-            faceView.findFaces(bitmap);
-        }
-    }
-
-    public void pickImage() {
+        // start camera and wait for result
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(takePictureIntent, REQUEST_CODE);
     }
@@ -42,7 +32,8 @@ public class CaptureImage extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             Bundle extras = data.getExtras();
-            bitmap = (Bitmap) extras.get("data");
+            Bitmap bitmap = (Bitmap) extras.get(RESPONSE_DATA);
+            FaceView faceView = (FaceView) findViewById(R.id.resultImageView);
             faceView.setBitmap(bitmap);
             faceView.findFaces(bitmap);
         }
