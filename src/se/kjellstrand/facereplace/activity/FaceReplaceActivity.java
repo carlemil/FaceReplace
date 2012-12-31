@@ -22,6 +22,7 @@ import android.util.Log;
 
 import se.kjellstrand.facereplace.R;
 import se.kjellstrand.facereplace.view.FaceView;
+import se.kjellstrand.facereplace.util.FileHandler;
 
 public class FaceReplaceActivity extends Activity {
     private static final int CAPTURE_PIC = 111101010;
@@ -87,7 +88,7 @@ public class FaceReplaceActivity extends Activity {
     }
 
     private void loadImageAndFindFaces(Uri imageUri) {
-        Bitmap bitmap = getImageFromSDCard(imageUri.getPath());
+        Bitmap bitmap = FileHandler.getImageFromSDCard(imageUri.getPath());
 
         faceView.setBitmap(bitmap);
 
@@ -96,47 +97,6 @@ public class FaceReplaceActivity extends Activity {
         faceView.addFacesToSrcFaceBitmapsList(faces, bitmap);
         
         faceView.invalidate();
-    }
-
-    private Bitmap getImageFromSDCard(String path) {
-        try {
-            File f = new File(path);
-            ExifInterface exif = new ExifInterface(f.getPath());
-            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
-                    ExifInterface.ORIENTATION_NORMAL);
-
-            int angle = 0;
-
-            if (orientation == ExifInterface.ORIENTATION_ROTATE_90) {
-                angle = 90;
-            }
-            else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) {
-                angle = 180;
-            }
-            else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) {
-                angle = 270;
-            }
-
-            Matrix mat = new Matrix();
-            mat.postRotate(angle);
-
-            BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
-
-            bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
-            bitmapFatoryOptions.inSampleSize = 3;
-            bitmapFatoryOptions.inMutable = true;
-
-            Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(f), null,
-                    bitmapFatoryOptions);
-            
-            return bitmap;
-            
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        } catch (OutOfMemoryError oom) {
-            oom.printStackTrace();
-        }
-        return null;
     }
 
     private Uri getTempFileUri()
