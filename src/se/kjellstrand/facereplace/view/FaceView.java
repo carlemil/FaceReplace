@@ -43,7 +43,7 @@ public class FaceView extends ImageView {
         super.onDraw(canvas);
         drawFacesOnCanvas(canvas);
     }
-
+    
     private void drawFacesOnCanvas(Canvas canvas) {
         if (mDstBitmap != null) {
             canvas.drawBitmap(mDstBitmap, null, new Rect(0, 0,
@@ -64,6 +64,7 @@ public class FaceView extends ImageView {
                     canvas.drawOval(new RectF(dst), mPaint);
 
                     mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+
                     canvas.drawBitmap(mSrcBitmaps.get(mSrcToDstFaceIndexArray[i++]), null, dst,
                             mPaint);
                 }
@@ -93,9 +94,16 @@ public class FaceView extends ImageView {
     public void setSrcToDstFaceIndexArray(int[] array) {
         this.mSrcToDstFaceIndexArray = array;
     }
+    
+    public int[] getSrcToDstFaceIndexArray() {
+        return this.mSrcToDstFaceIndexArray;
+    }
 
     public void setSrcBitmaps(ArrayList<Bitmap> mSrcBitmaps) {
         this.mSrcBitmaps = mSrcBitmaps;
+    }
+    public ArrayList<Bitmap> getSrcBitmaps() {
+        return mSrcBitmaps;
     }
 
 }

@@ -59,6 +59,7 @@ public class FaceHelper {
         // GOLDEN_RATIO
         // float xRatio = ((float) getWidth()) / mBitmap.getWidth();
         // float yRatio = ((float) getHeight()) / mBitmap.getHeight();
+        // TODO improve scaling by looking at pose and euler y
         PointF midPoint = new PointF();
         face.getMidPoint(midPoint);
         int x = (int) (midPoint.x - (face.eyesDistance()));

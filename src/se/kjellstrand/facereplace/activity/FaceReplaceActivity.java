@@ -30,7 +30,7 @@ public class FaceReplaceActivity extends Activity {
 
     private Uri mFileUri = null;
 
-    private FaceView faceView;
+    private FaceView mFaceView;
 
     /** Called when the activity is first created. */
     @Override
@@ -45,19 +45,21 @@ public class FaceReplaceActivity extends Activity {
             mFileUri = Uri.parse(savedInstanceState.getString(FILE_URI_KEY));
         }
 
-        faceView = (FaceView) findViewById(R.id.resultImageView);
+        mFaceView = (FaceView) findViewById(R.id.resultImageView);
+        File file = new File(Environment.getExternalStorageDirectory(),
+                "/download/img.jpg");
+        mFileUri = Uri.fromFile(file);
 
-        mFileUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(),
-                "/download/img.jpg"));
-        Log.d("TAG", "PATH: " + mFileUri.getPath());
         if (mFileUri == null) {
             pickImage();
         } else {
-            loadImageAndFindFaces(mFileUri);
+            Uri srcImageUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(),
+                    "/download/img4.jpg"));
+            loadImageAndFindFaces(mFileUri, srcImageUri);
 
             setRandomFaceOrder();
 
-            faceView.invalidate();
+            mFaceView.invalidate();
         }
     }
 
@@ -68,12 +70,12 @@ public class FaceReplaceActivity extends Activity {
                 pickImage();
             }
         });
-        
+
         findViewById(R.id.randomizeFaces).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 setRandomFaceOrder();
-                faceView.invalidate();
+                mFaceView.invalidate();
             }
         });
     }
@@ -104,32 +106,34 @@ public class FaceReplaceActivity extends Activity {
             if (imageUri == null) {
                 imageUri = mFileUri;
             }
-
-            loadImageAndFindFaces(imageUri);
+            Uri srcImageUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(),
+                    "/download/img4.jpg"));
+            loadImageAndFindFaces(imageUri, srcImageUri);
 
             setRandomFaceOrder();
 
-            faceView.invalidate();
+            mFaceView.invalidate();
         }
     }
 
-    private void loadImageAndFindFaces(Uri imageUri) {
-        Bitmap srcBitmap = FileHandler.getImageFromSDCard(imageUri.getPath(), 600, 600);
+    private void loadImageAndFindFaces(Uri dstImageUri, Uri srcImageUri) {
+        // TODO measure screen/layout size properly and use better values
+        Bitmap srcBitmap = FileHandler.getImageFromSDCard(srcImageUri.getPath(), 600, 600);
         ArrayList<Face> srcFaces = FaceHelper.findFaces(srcBitmap);
         ArrayList<Bitmap> srcBitmaps = FaceHelper.getBitmapsForFaces(srcFaces, srcBitmap);
-        faceView.setSrcBitmaps(srcBitmaps);
+        mFaceView.setSrcBitmaps(srcBitmaps);
 
-        Bitmap dstBitmap = FileHandler.getImageFromSDCard(imageUri.getPath(), 600, 600);
-        faceView.setBitmap(dstBitmap);
+        Bitmap dstBitmap = FileHandler.getImageFromSDCard(dstImageUri.getPath(), 600, 600);
+        mFaceView.setBitmap(dstBitmap);
     }
 
     private void setRandomFaceOrder() {
-        int[] array = new int[faceView.getNumberOfFaces()];
+        int numberOfSourceFaces = mFaceView.getSrcBitmaps().size();
+        int[] array = new int[mFaceView.getNumberOfFaces()];
         for (int i = 0; i < array.length; i++) {
-            array[i] = (int) (Math.random() * array.length);
-            Log.d(TAG, "a: " + array[i]);
+            array[i] = (int) (Math.random() * numberOfSourceFaces);
         }
-        faceView.setSrcToDstFaceIndexArray(array);
+        mFaceView.setSrcToDstFaceIndexArray(array);
     }
 
     private Uri getTempFileUri() {

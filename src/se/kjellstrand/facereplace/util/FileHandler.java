@@ -50,6 +50,7 @@ public class FileHandler {
                 BitmapFactory.decodeStream(new FileInputStream(f), null,
                         bitmapFatoryOptions);
 
+                // TODO calc max of w/h 
                 bitmapFatoryOptions.inSampleSize = bitmapFatoryOptions.outWidth / maxWidth;
                 Log.d(TAG, "sampleSize: " + bitmapFatoryOptions.inSampleSize);
 
