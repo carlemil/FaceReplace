@@ -7,24 +7,19 @@ import se.kjellstrand.facereplace.util.FaceHelper;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.media.FaceDetector;
 import android.media.FaceDetector.Face;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
+import android.widget.ImageView;
 
-public class FaceView extends View {
+public class FaceView extends ImageView {
 
     private final String TAG = FaceView.class.getSimpleName();
 
@@ -40,6 +35,7 @@ public class FaceView extends View {
 
     public FaceView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
+        setScaleType(ImageView.ScaleType.CENTER_INSIDE);
     }
 
     @Override

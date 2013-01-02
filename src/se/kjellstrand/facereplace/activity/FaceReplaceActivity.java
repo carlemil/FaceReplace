@@ -2,17 +2,11 @@
 package se.kjellstrand.facereplace.activity;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.media.FaceDetector.Face;
 import android.net.Uri;
 import android.os.Bundle;
@@ -120,12 +114,12 @@ public class FaceReplaceActivity extends Activity {
     }
 
     private void loadImageAndFindFaces(Uri imageUri) {
-        Bitmap srcBitmap = FileHandler.getImageFromSDCard(imageUri.getPath());
+        Bitmap srcBitmap = FileHandler.getImageFromSDCard(imageUri.getPath(), 600, 600);
         ArrayList<Face> srcFaces = FaceHelper.findFaces(srcBitmap);
         ArrayList<Bitmap> srcBitmaps = FaceHelper.getBitmapsForFaces(srcFaces, srcBitmap);
         faceView.setSrcBitmaps(srcBitmaps);
 
-        Bitmap dstBitmap = FileHandler.getImageFromSDCard(imageUri.getPath());
+        Bitmap dstBitmap = FileHandler.getImageFromSDCard(imageUri.getPath(), 600, 600);
         faceView.setBitmap(dstBitmap);
     }
 

@@ -4,7 +4,6 @@ package se.kjellstrand.facereplace.util;
 import java.util.ArrayList;
 
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.media.FaceDetector;
