@@ -60,7 +60,6 @@ public class FaceView extends View {
             int i = 0;
             for (Face face : mDstFaces) {
                 if (face != null) {
-                    //Rect src = FaceHelper.getFaceRect(mDstFaces.get(mSrcToDstFaceIndexArray[i]));
                     Rect dst = FaceHelper.getFaceRect(face);
 
                     mPaint.setMaskFilter(new BlurMaskFilter(6.0f, BlurMaskFilter.Blur.NORMAL));
@@ -69,35 +68,36 @@ public class FaceView extends View {
                     canvas.drawOval(new RectF(dst), mPaint);
 
                     mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-                    canvas.drawBitmap(mSrcBitmaps.get(mSrcToDstFaceIndexArray[i++]), null, dst, mPaint);
-
-                    //Log.d(TAG, "src rect: " + src);
-                    Log.d(TAG, "dst rect: " + dst);
-
+                    canvas.drawBitmap(mSrcBitmaps.get(mSrcToDstFaceIndexArray[i++]), null, dst,
+                            mPaint);
                 }
             }
             mPaint.setXfermode(null);
             canvas.restoreToCount(sc);
         }
     }
-    
+
     public void setBitmap(Bitmap bitmap) {
         // Create a bitmap of the same size
         mDstBitmap = bitmap;
-        
+
         long startTime = System.currentTimeMillis();
         boolean isMutable = true;
         mDstBitmap = mDstBitmap.copy(Bitmap.Config.ARGB_8888, isMutable);
         Log.d(TAG, "Converting bitmap to 8888 format took: "
                 + (System.currentTimeMillis() - startTime) + " ms.");
-        
+
         mDstFaces = FaceHelper.findFaces(bitmap);
     }
-    
+
+    public int getNumberOfFaces() {
+        return mDstFaces == null ? 0 : mDstFaces.size();
+    }
+
     public void setSrcToDstFaceIndexArray(int[] array) {
         this.mSrcToDstFaceIndexArray = array;
     }
-    
+
     public void setSrcBitmaps(ArrayList<Bitmap> mSrcBitmaps) {
         this.mSrcBitmaps = mSrcBitmaps;
     }

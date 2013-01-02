@@ -19,6 +19,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
 
 import se.kjellstrand.facereplace.R;
 import se.kjellstrand.facereplace.view.FaceView;
@@ -31,33 +33,55 @@ public class FaceReplaceActivity extends Activity {
     private static final String FILE_URI_KEY = "FILE_URI_KEY";
 
     private String TAG = FaceReplaceActivity.class.getSimpleName();
-    
+
     private Uri mFileUri = null;
 
     private FaceView faceView;
-
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         setContentView(R.layout.main);
-        
+
+        setButtonOnClickListeners();
+
         if (savedInstanceState != null && savedInstanceState.containsKey(FILE_URI_KEY)) {
             mFileUri = Uri.parse(savedInstanceState.getString(FILE_URI_KEY));
         }
-    
+
         faceView = (FaceView) findViewById(R.id.resultImageView);
-        
+
         mFileUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(),
                 "/download/img.jpg"));
-        Log.d("TAG", "PATH: "+mFileUri.getPath());
+        Log.d("TAG", "PATH: " + mFileUri.getPath());
         if (mFileUri == null) {
             pickImage();
         } else {
             loadImageAndFindFaces(mFileUri);
+
+            setRandomFaceOrder();
+
+            faceView.invalidate();
         }
+    }
+
+    private void setButtonOnClickListeners() {
+        findViewById(R.id.takeAPicture).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickImage();
+            }
+        });
+        
+        findViewById(R.id.randomizeFaces).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setRandomFaceOrder();
+                faceView.invalidate();
+            }
+        });
     }
 
     @Override
@@ -88,33 +112,33 @@ public class FaceReplaceActivity extends Activity {
             }
 
             loadImageAndFindFaces(imageUri);
+
+            setRandomFaceOrder();
+
+            faceView.invalidate();
         }
     }
 
     private void loadImageAndFindFaces(Uri imageUri) {
-        
-        Bitmap srcBitmap = FileHandler.getImageFromSDCard(Uri.fromFile(new File(Environment.getExternalStorageDirectory(),
-                "/download/img4.jpg")).getPath());
+        Bitmap srcBitmap = FileHandler.getImageFromSDCard(imageUri.getPath());
         ArrayList<Face> srcFaces = FaceHelper.findFaces(srcBitmap);
         ArrayList<Bitmap> srcBitmaps = FaceHelper.getBitmapsForFaces(srcFaces, srcBitmap);
         faceView.setSrcBitmaps(srcBitmaps);
 
-
         Bitmap dstBitmap = FileHandler.getImageFromSDCard(imageUri.getPath());
         faceView.setBitmap(dstBitmap);
-
-        int[] array = new int[4];
-        array[0] = 5;
-        array[1] = 6;
-        array[2] = 7;
-        array[3] = 8;
-
-        faceView.setSrcToDstFaceIndexArray(array);
-        faceView.invalidate();
     }
 
-    private Uri getTempFileUri()
-    {
+    private void setRandomFaceOrder() {
+        int[] array = new int[faceView.getNumberOfFaces()];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = (int) (Math.random() * array.length);
+            Log.d(TAG, "a: " + array[i]);
+        }
+        faceView.setSrcToDstFaceIndexArray(array);
+    }
+
+    private Uri getTempFileUri() {
         return Uri.fromFile(new File(Environment.getExternalStorageDirectory(),
                 "FaceReplace" + String.valueOf(System.currentTimeMillis()) + ".jpg"));
     }

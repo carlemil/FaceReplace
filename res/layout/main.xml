@@ -10,6 +10,12 @@
         android:layout_height="wrap_content" 
         android:text="@string/take_a_picture"/>
 
+    <Button
+        android:id="@+id/randomizeFaces"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" 
+        android:text="@string/randomize_faces"/>
+    
     <se.kjellstrand.facereplace.view.FaceView
         android:id="@+id/resultImageView"
         android:layout_width="fill_parent"
