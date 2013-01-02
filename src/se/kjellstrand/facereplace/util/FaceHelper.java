@@ -16,11 +16,10 @@ public class FaceHelper {
     private static final String TAG = FaceHelper.class.getSimpleName();
 
     private static final float GOLDEN_RATIO = 1.61803399f;
-    
+
     private static FaceDetector mFacesDetector;
 
     public static final int NUM_FACES = 10;
-
 
     public static ArrayList<Face> findFaces(Bitmap bitmap) {
         ArrayList<Face> facesList = new ArrayList<Face>();
@@ -30,7 +29,7 @@ public class FaceHelper {
             mFacesDetector = new FaceDetector(bitmap.getWidth(),
                     bitmap.getHeight(), FaceHelper.NUM_FACES);
             int numberOfFaces = mFacesDetector.findFaces(bitmap, faces);
-            Log.d(TAG , "Finding faces took " +
+            Log.d(TAG, "Finding faces took " +
                     (System.currentTimeMillis() - startTime) + " ms.");
             for (int i = 0; i < numberOfFaces; i++) {
                 facesList.add(faces[i]);
@@ -39,28 +38,22 @@ public class FaceHelper {
 
         return facesList;
     }
-    
+
     @SuppressWarnings("static-access")
-    public static void addFacesToSrcFaceBitmapsList(ArrayList<Face> faces, Bitmap bitmap,
-            ArrayList<Bitmap> srcFaceBitmaps) {
+    public static ArrayList<Bitmap> getBitmapsForFaces(ArrayList<Face> faces, Bitmap bitmap) {
+        ArrayList<Bitmap> srcBitmaps = new ArrayList<Bitmap>();
         for (Face face : faces) {
             if (face != null) {
                 Rect src = getFaceRect(face);
-
-                // Experiment with false and see if it looks better
-                boolean filter = true;
-                Matrix m = new Matrix();
-
-                // calcualte the real scale, or should we do nothing since
-                // we anyway dont know the fial size ? better send null as
-                // matrix ?
-                m.setScale(2f, 2f);
-
-                srcFaceBitmaps.add(bitmap.createBitmap(bitmap, src.left, src.top,
-                        src.right - src.left, src.bottom - src.top, m, filter));
-
+                try {
+                    srcBitmaps.add(bitmap.createBitmap(bitmap, src.left, src.top,
+                            src.right - src.left, src.bottom - src.top, null, false));
+                } catch (Exception e) {
+                    Log.e("Error", "in getBitmapsForFaces: " + e.getMessage());
+                }
             }
         }
+        return srcBitmaps;
     }
 
     public static Rect getFaceRect(Face face) {

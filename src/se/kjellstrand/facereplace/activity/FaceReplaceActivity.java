@@ -30,11 +30,12 @@ public class FaceReplaceActivity extends Activity {
 
     private static final String FILE_URI_KEY = "FILE_URI_KEY";
 
-
+    private String TAG = FaceReplaceActivity.class.getSimpleName();
     
     private Uri mFileUri = null;
 
     private FaceView faceView;
+
 
     /** Called when the activity is first created. */
     @Override
@@ -91,27 +92,24 @@ public class FaceReplaceActivity extends Activity {
     }
 
     private void loadImageAndFindFaces(Uri imageUri) {
-        Bitmap dstBitmap = FileHandler.getImageFromSDCard(imageUri.getPath());
+        
+        Bitmap srcBitmap = FileHandler.getImageFromSDCard(Uri.fromFile(new File(Environment.getExternalStorageDirectory(),
+                "/download/img4.jpg")).getPath());
+        ArrayList<Face> srcFaces = FaceHelper.findFaces(srcBitmap);
+        ArrayList<Bitmap> srcBitmaps = FaceHelper.getBitmapsForFaces(srcFaces, srcBitmap);
+        faceView.setSrcBitmaps(srcBitmaps);
 
+
+        Bitmap dstBitmap = FileHandler.getImageFromSDCard(imageUri.getPath());
         faceView.setBitmap(dstBitmap);
 
-        ArrayList<Face> dstFaces = FaceHelper.findFaces(dstBitmap);
-
-// skapa src bitmaps och sätt dom istället för dst nedan
-        
-        ArrayList<Bitmap> srcBitmaps = new ArrayList<Bitmap>();
-
-        FaceHelper.addFacesToSrcFaceBitmapsList(dstFaces, dstBitmap, srcBitmaps);
-        
-        faceView.setSrcBitmaps(srcBitmaps);
-        
         int[] array = new int[4];
-        array[0] = 1;
-        array[1] = 2;
-        array[2] = 3;
-        array[3] = 0;
+        array[0] = 5;
+        array[1] = 6;
+        array[2] = 7;
+        array[3] = 8;
 
-        faceView.setSrcToDstFaceIndexArray(array );
+        faceView.setSrcToDstFaceIndexArray(array);
         faceView.invalidate();
     }
 
