@@ -21,9 +21,10 @@ import android.widget.ImageView;
 
 public class FaceView extends ImageView {
 
-    private final String TAG = FaceView.class.getSimpleName();
+    private static final String TAG = FaceView.class.getSimpleName();
 
     private ArrayList<Face> mDstFaces = new ArrayList<Face>();
+    private ArrayList<Face> mSrcFaces = new ArrayList<Face>();
 
     private Bitmap mDstBitmap;
 
@@ -74,7 +75,7 @@ public class FaceView extends ImageView {
         }
     }
 
-    public void setBitmap(Bitmap bitmap) {
+    public void setDstBitmap(Bitmap bitmap) {
         // Create a bitmap of the same size
         mDstBitmap = bitmap;
 
@@ -91,8 +92,9 @@ public class FaceView extends ImageView {
         return mDstFaces == null ? 0 : mDstFaces.size();
     }
 
-    public void setSrcToDstFaceIndexArray(int[] array) {
-        this.mSrcToDstFaceIndexArray = array;
+    public void setSrcFaces(int[] indexArray, ArrayList<Face> srcFaces) {
+        this.mSrcToDstFaceIndexArray = indexArray;
+        this.mSrcFaces = srcFaces;
     }
     
     public int[] getSrcToDstFaceIndexArray() {

@@ -35,7 +35,7 @@ public class CaptureImageActivity extends Activity {
             Bundle extras = data.getExtras();
             Bitmap bitmap = (Bitmap) extras.get(RESPONSE_DATA);
             FaceView faceView = (FaceView) findViewById(R.id.resultImageView);
-            faceView.setBitmap(bitmap);
+            faceView.setDstBitmap(bitmap);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

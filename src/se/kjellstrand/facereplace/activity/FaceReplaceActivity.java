@@ -22,11 +22,11 @@ import se.kjellstrand.facereplace.util.FaceHelper;
 import se.kjellstrand.facereplace.util.FileHandler;
 
 public class FaceReplaceActivity extends Activity {
+    private static final String TAG = FaceReplaceActivity.class.getSimpleName();
     private static final int CAPTURE_PIC = 111101010;
-
     private static final String FILE_URI_KEY = "FILE_URI_KEY";
 
-    private String TAG = FaceReplaceActivity.class.getSimpleName();
+    private ArrayList<Face> mSrcFaces = new ArrayList<Face>();
 
     private Uri mFileUri = null;
 
@@ -57,7 +57,8 @@ public class FaceReplaceActivity extends Activity {
                     "/download/img4.jpg"));
             loadImageAndFindFaces(mFileUri, srcImageUri);
 
-            setRandomFaceOrder();
+            int array[] = getRandomFaceOrder(mSrcFaces);
+            mFaceView.setSrcFaces(array, mSrcFaces);
 
             mFaceView.invalidate();
         }
@@ -74,7 +75,9 @@ public class FaceReplaceActivity extends Activity {
         findViewById(R.id.randomizeFaces).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                setRandomFaceOrder();
+                int randomOrderArray[] = getRandomFaceOrder(mSrcFaces);
+                mFaceView.setSrcFaces(randomOrderArray, mSrcFaces);
+
                 mFaceView.invalidate();
             }
         });
@@ -110,7 +113,8 @@ public class FaceReplaceActivity extends Activity {
                     "/download/img4.jpg"));
             loadImageAndFindFaces(imageUri, srcImageUri);
 
-            setRandomFaceOrder();
+            int randomOrderArray[] = getRandomFaceOrder(mSrcFaces);
+            mFaceView.setSrcFaces(randomOrderArray, mSrcFaces);
 
             mFaceView.invalidate();
         }
@@ -119,21 +123,21 @@ public class FaceReplaceActivity extends Activity {
     private void loadImageAndFindFaces(Uri dstImageUri, Uri srcImageUri) {
         // TODO measure screen/layout size properly and use better values
         Bitmap srcBitmap = FileHandler.getImageFromSDCard(srcImageUri.getPath(), 600, 600);
-        ArrayList<Face> srcFaces = FaceHelper.findFaces(srcBitmap);
-        ArrayList<Bitmap> srcBitmaps = FaceHelper.getBitmapsForFaces(srcFaces, srcBitmap);
+        mSrcFaces = FaceHelper.findFaces(srcBitmap);
+        ArrayList<Bitmap> srcBitmaps = FaceHelper.getBitmapsForFaces(mSrcFaces, srcBitmap);
         mFaceView.setSrcBitmaps(srcBitmaps);
 
         Bitmap dstBitmap = FileHandler.getImageFromSDCard(dstImageUri.getPath(), 600, 600);
-        mFaceView.setBitmap(dstBitmap);
+        mFaceView.setDstBitmap(dstBitmap);
     }
 
-    private void setRandomFaceOrder() {
+    private int[] getRandomFaceOrder(ArrayList<Face> srcFaces) {
         int numberOfSourceFaces = mFaceView.getSrcBitmaps().size();
         int[] array = new int[mFaceView.getNumberOfFaces()];
         for (int i = 0; i < array.length; i++) {
             array[i] = (int) (Math.random() * numberOfSourceFaces);
         }
-        mFaceView.setSrcToDstFaceIndexArray(array);
+        return array;
     }
 
     private Uri getTempFileUri() {
