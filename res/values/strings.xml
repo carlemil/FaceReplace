@@ -5,5 +5,7 @@
     <string name="app_name">FaceReplace</string>
     <string name="take_a_picture">Take a picture</string>
     <string name="randomize_faces">Randomize Faces</string>
+    <string name="share">Share</string>
+    <string name="share_image">Share Image</string>
 
 </resources>

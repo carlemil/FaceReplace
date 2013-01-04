@@ -25,7 +25,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:paddingLeft="4dip"
-            android:text="@string/randomize_faces" />
+            android:text="@string/randomize_faces" />        
+            
+        <Button
+            android:id="@+id/share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="4dip"
+            android:text="@string/share" />
     </LinearLayout>
 
     <se.kjellstrand.facereplace.view.FaceView

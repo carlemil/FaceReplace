@@ -66,7 +66,8 @@ public class FaceView extends ImageView {
 
                     mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
 
-                    canvas.drawBitmap(mSrcBitmaps.get(mSrcToDstFaceIndexArray[i++]), null, dst,
+                    int index = mSrcToDstFaceIndexArray[i++];
+                    canvas.drawBitmap(mSrcBitmaps.get(index), null, dst,
                             mPaint);
                 }
             }
@@ -104,8 +105,12 @@ public class FaceView extends ImageView {
     public void setSrcBitmaps(ArrayList<Bitmap> mSrcBitmaps) {
         this.mSrcBitmaps = mSrcBitmaps;
     }
+    
     public ArrayList<Bitmap> getSrcBitmaps() {
         return mSrcBitmaps;
     }
 
+    public Bitmap getDstBitmap(){
+        return mDstBitmap;
+    }
 }
