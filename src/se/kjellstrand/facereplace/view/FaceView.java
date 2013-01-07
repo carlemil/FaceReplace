@@ -36,7 +36,6 @@ public class FaceView extends ImageView {
 
     public FaceView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
-        setScaleType(ImageView.ScaleType.CENTER_INSIDE);
     }
 
     @Override
@@ -55,11 +54,10 @@ public class FaceView extends ImageView {
                     Canvas.FULL_COLOR_LAYER_SAVE_FLAG |
                     Canvas.CLIP_TO_LAYER_SAVE_FLAG);
             int i = 0;
+            mPaint.setMaskFilter(new BlurMaskFilter(6.0f, BlurMaskFilter.Blur.INNER));
             for (Face face : mDstFaces) {
                 if (face != null) {
                     Rect dst = FaceHelper.getFaceRect(face);
-
-                    mPaint.setMaskFilter(new BlurMaskFilter(6.0f, BlurMaskFilter.Blur.NORMAL));
 
                     mPaint.setXfermode(null);
                     canvas.drawOval(new RectF(dst), mPaint);
@@ -71,6 +69,7 @@ public class FaceView extends ImageView {
                             mPaint);
                 }
             }
+            mPaint.setMaskFilter(null);
             mPaint.setXfermode(null);
             canvas.restoreToCount(sc);
         }

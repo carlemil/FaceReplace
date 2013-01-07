@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -47,7 +48,6 @@ public class FaceReplaceActivity extends Activity {
         if (!appStoragePath.exists()) {
             boolean createDir = appStoragePath.mkdirs();
             Log.d(TAG, "creating dir " + appStoragePath.getPath() + " : " + createDir);
-
         }
 
         setButtonOnClickListeners();
@@ -60,7 +60,7 @@ public class FaceReplaceActivity extends Activity {
         File file = new File(getTempFileUri().getPath());
         Log.d(TAG, "tmp file path: " + file.getPath());
 
-        Log.d(TAG, "file.exists(): "+file.exists());
+        Log.d(TAG, "file.exists(): " + file.exists());
         if (!file.exists()) {
             // TODO dialog med "take a picture with some faces in it."
             boolean createdNewFile = false;
@@ -98,6 +98,7 @@ public class FaceReplaceActivity extends Activity {
             public void onClick(View v) {
                 int randomOrderArray[] = getRandomFaceOrder(mSrcFaces);
                 mFaceView.setSrcFaces(randomOrderArray, mSrcFaces);
+                Log.d(TAG, "ah: "+mFaceView.getHeight() + " w: "+mFaceView.getWidth());
 
                 mFaceView.invalidate();
             }
@@ -109,7 +110,7 @@ public class FaceReplaceActivity extends Activity {
                 Uri uri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(),
                         SHARE_PHOTO_PATH));
                 FileHandler.writeImageToSDCard(uri, mFaceView.getDrawingCache());
-                
+
                 Intent share = new Intent(Intent.ACTION_SEND);
                 share.setType("image/jpeg");
 
@@ -119,7 +120,7 @@ public class FaceReplaceActivity extends Activity {
                 startActivity(Intent.createChooser(share, "Share Image"));
             }
         });
-
+        // android.R.drawable.ic_menu_share
         // TODO swap all faces to one
     }
 
@@ -163,14 +164,20 @@ public class FaceReplaceActivity extends Activity {
     }
 
     private void loadImageAndFindFaces(Uri dstImageUri, Uri srcImageUri) {
-        // TODO measure screen/layout size properly and use better values
-        Bitmap srcBitmap = FileHandler.getImageFromSDCard(srcImageUri.getPath(), 600, 600);
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int width = metrics.heightPixels;
+        int height = metrics.widthPixels;
+        
+        Bitmap srcBitmap = FileHandler.getImageFromSDCard(srcImageUri.getPath(), width, height);
         mSrcFaces = FaceHelper.findFaces(srcBitmap);
         ArrayList<Bitmap> srcBitmaps = FaceHelper.getBitmapsForFaces(mSrcFaces, srcBitmap);
         mFaceView.setSrcBitmaps(srcBitmaps);
 
-        Bitmap dstBitmap = FileHandler.getImageFromSDCard(dstImageUri.getPath(), 600, 600);
+        Log.d(TAG, "bh: "+mFaceView.getHeight() + " w: "+mFaceView.getWidth());
+        Bitmap dstBitmap = FileHandler.getImageFromSDCard(dstImageUri.getPath(), width, height);
         mFaceView.setDstBitmap(dstBitmap);
+        Log.d(TAG, "ah: "+mFaceView.getHeight() + " w: "+mFaceView.getWidth());
     }
 
     private int[] getRandomFaceOrder(ArrayList<Face> srcFaces) {

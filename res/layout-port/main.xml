@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical"
     android:padding="8dip" >
 
@@ -11,33 +11,9 @@
         android:orientation="horizontal"
         android:paddingBottom="4dip" >
 
-        <Button
-            android:id="@+id/takeAPicture"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:paddingRight="4dip"
-            android:text="@string/take_a_picture" />
-
-        <Button
-            android:id="@+id/randomizeFaces"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:paddingLeft="4dip"
-            android:text="@string/randomize_faces" />        
-            
-        <Button
-            android:id="@+id/share"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="4dip"
-            android:text="@string/share" />
+        <include layout="@layout/buttons" />
     </LinearLayout>
 
-    <se.kjellstrand.facereplace.view.FaceView
-        android:id="@+id/resultImageView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <include layout="@layout/image_view" />
 
 </LinearLayout>
